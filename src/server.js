@@ -1,4 +1,5 @@
 const http = require('http')
+const { Packager } = require('./packagers/packager')
 const protocol = require('./protocol')
 
 class YarServer {
@@ -19,15 +20,28 @@ class YarServer {
 
       req.on('end', () => {
         if (!buf || !buf.length) return
-        const reqData = protocol.unpack(buf)
-        const data = this.methods[reqData.payload.m](reqData.payload.p)
+        // const reqHeader = protocol.parse(buf)
+        const packagerName = buf.toString('utf-8', 82, 90).trim().replace(/\0/g, '')
+        const packager = new Packager(packagerName)
+
+        const reqBody = buf.slice(90)
+        const reqPayload = packager.unpack(reqBody)
+
+        const result = this.methods[reqPayload.m](reqPayload.p)
         const payload = {
           i: Math.floor(Math.random() * 10e6),
-          r: data
+          s: 0,
+          r: result,
+          o: '',
+          e: ''
         }
 
-        const packet = protocol.pack(payload.i, undefined, undefined, payload)
+        const packagerNameBuf = buf.slice(82, 90)
+        const body = Buffer.from(packager.pack(payload))
+        const packetLength = 82 + packagerNameBuf.length + body.length
+        const header = protocol.render(payload.i, undefined, undefined, packetLength)
 
+        const packet = Buffer.concat([header, packagerNameBuf, body], packetLength)
         res.write(packet)
         res.end()
       })

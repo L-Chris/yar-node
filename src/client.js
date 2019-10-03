@@ -1,5 +1,6 @@
 const http = require('http')
 const { URL } = require('url')
+const { Packager } = require('./packagers/packager')
 const protocol = require('./protocol')
 
 class YarClient {
@@ -8,7 +9,12 @@ class YarClient {
 
     this._uri = uriOptions
     this._protocol = uriOptions.protocol
+
+    options.packager = options.packager || 'json'
+
     this._options = options
+
+    this.packager = new Packager(this._options.packager)
   }
 
   call(mehod, params, callback) {
@@ -32,7 +38,12 @@ class YarClient {
       p: params
     }
 
-    const packet = protocol.pack(payload.i, undefined, undefined, payload)
+    const packagerNameBuf = Buffer.alloc(8)
+    packagerNameBuf.write(this._options.packager, 0, 8, 'utf-8')
+    const body = Buffer.from(this.packager.pack(payload))
+    const packetLength = 82 + packagerNameBuf.length + body.length
+    const header = protocol.render(payload.i, undefined, undefined, packetLength)
+    const packet = Buffer.concat([header, packagerNameBuf, body], packetLength)
 
     const req = http.request(options, res => {
       let buf = Buffer.alloc(0)
@@ -41,8 +52,10 @@ class YarClient {
       })
       res.on('end', () => {
         if (!buf.length) return
-        const res = protocol.unpack(buf)
-        callback(res.payload.r)
+        // const reqHeader = protocol.parse(buf)
+        const reqBody = buf.slice(82 + packagerNameBuf.length, buf.length)
+        const reqPayload = this.packager.unpack(reqBody)
+        callback(reqPayload.r)
       })
     })
 
