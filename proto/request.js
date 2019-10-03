@@ -1,8 +1,8 @@
 const { Packager } = require('./packagers/packager')
 
 class YarRequest {
-  constructor(id, method, params = {}, options = {}) {
-    this.id = id
+  constructor(method, params = {}, options = {}) {
+    this.id = Math.floor(Math.random() * 10e6)
     this.method = method
 
     this.parameters = params
