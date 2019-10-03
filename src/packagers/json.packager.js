@@ -1,7 +1,7 @@
 
 class JSONPackager {
   pack(packet) {
-    if (typeof packet !== 'object') {
+    if (typeof req !== 'object') {
       throw new Error('packet is not an Object')
     }
 

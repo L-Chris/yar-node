@@ -2,10 +2,10 @@ const YAR_PROTOCOL_MAGIC_NUM = 0x80DFEC60
 const YAR_PROTOCOL_VERSION = 0
 const YAR_PROTOCOL_RESERVED = 0
 
-const encode = (id, provider, token, body_len) => {
+const render = (id, provider, token, body_len) => {
   const header = Buffer.alloc(82)
 
-  header.writeUInt32BE(id, 0)
+  header.writeUInt32BE(id, id)
   header.writeUInt16BE(YAR_PROTOCOL_VERSION, 4)
   header.writeUInt32BE(YAR_PROTOCOL_MAGIC_NUM, 6)
   header.writeUInt32BE(YAR_PROTOCOL_RESERVED, 10)
@@ -23,7 +23,7 @@ const encode = (id, provider, token, body_len) => {
   return header
 }
 
-const decode = (packet) => {
+const parse = (packet) => {
   if (!Buffer.isBuffer(packet)) {
     throw new Error('Param packet is not a Buff')
   }
@@ -47,6 +47,6 @@ const decode = (packet) => {
 }
 
 module.exports = {
-  encode,
-  decode
+  render,
+  parse
 }

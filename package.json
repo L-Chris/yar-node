@@ -1,10 +1,12 @@
 {
-  "name": "node-yar",
-  "version": "1.0.0",
+  "name": "yar-node",
+  "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
     "nodemon": "^1.19.2"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "repository": "https://github.com/L-Chris/yar-node",
+  "author": "Jiahui.liang <563303226@QQ.COM>"
 }

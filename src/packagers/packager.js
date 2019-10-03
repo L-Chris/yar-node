@@ -15,6 +15,14 @@ class Packager {
         throw new Error('unsupported packger type')
     }
   }
+
+  static pack(type, req) {
+    const packager = new Packager(type)
+
+    const packet = packager.pack(req)
+
+    return packet
+  }
 }
 
-module.Packager = Packager
+exports.Packager = Packager

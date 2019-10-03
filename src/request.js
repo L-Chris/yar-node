@@ -1,36 +1,28 @@
-const http = require('http')
-const { URL } = require('url')
+const { Packager } = require('./packagers/packager')
 
-const request = (address, data, callback, header = {}) => {
-  const urlOptions = new URL(address)
+class YarRequest {
+  constructor(id, method, params = {}, options = {}) {
+    this.id = id
+    this.method = method
 
-  const options = {
-    hostname: urlOptions.hostname,
-    port: urlOptions.port,
-    path: urlOptions.pathname,
-    protocol: urlOptions.protocol,
-    method: 'POST'
+    this.parameters = params
+    this.options = options
   }
 
-  options['headers'] = {
-    'Content-Type': 'application/octet-stream'
+  static pack(request) {
+    const packagerName = request.options.packager
+    const req = {
+      i: request.id,
+      m: request.method,
+      p: request.parameters
+    }
+
+    const payload = Packager.pack(packagerName, req)
+
+    return payload
   }
 
-  if (options.protocol !== 'http:') throw new Error('UnSupported protocol error')
-
-  // const buf = Buffer.alloc(1000)
-
-  http.request(options, res => {
-    res.on('data', chunk => {
-      console.log(typeof chunk)
-    })
-
-    res.on('end', () => {
-      console.log('end')
-    })
-  })
+  static unpack() {}
 }
 
-module.exports = {
-  request
-}
+exports.YarRequest = YarRequest
