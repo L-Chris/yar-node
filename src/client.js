@@ -1,5 +1,6 @@
 const http = require('http')
 const { URL } = require('url')
+const protocol = require('./protocol')
 
 class YarClient {
   constructor(uri, options = {}) {
@@ -25,22 +26,27 @@ class YarClient {
       }
     }
 
-    const data = {
+    const payload = {
       i: Math.floor(Math.random() * 10e6),
       m: mehod,
       p: params
     }
 
+    const packet = protocol.pack(payload.i, undefined, undefined, payload)
+
     const req = http.request(options, res => {
-      const buf = new Buffer()
-      res.on('data', chunk => chunk)
+      let buf = Buffer.alloc(0)
+      res.on('data', chunk => {
+        buf = Buffer.concat([buf, chunk])
+      })
       res.on('end', () => {
-        const res = unpack(buf)
-        callback(res)
+        if (!buf.length) return
+        const res = protocol.unpack(buf)
+        callback(res.payload.r)
       })
     })
 
-    req.write(data)
+    req.write(packet)
 
     req.end()
   }
