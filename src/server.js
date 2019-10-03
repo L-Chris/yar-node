@@ -3,10 +3,10 @@ const { Packager } = require('./packagers/packager')
 const protocol = require('./protocol')
 
 class YarServer {
-  constructor(port, methods) {
+  constructor(port, methods, options) {
     this.port = port
     this.methods = methods
-
+    this.options = options
     this.init()
   }
 

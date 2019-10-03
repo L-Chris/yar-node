@@ -6,7 +6,9 @@
   "devDependencies": {
     "nodemon": "^1.19.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "php-serialize": "^3.0.0"
+  },
   "repository": "https://github.com/L-Chris/yar-node",
   "author": "Jiahui.liang <563303226@QQ.COM>"
 }

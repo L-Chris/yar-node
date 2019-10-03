@@ -10,7 +10,7 @@ class YarClient {
     this._uri = uriOptions
     this._protocol = uriOptions.protocol
 
-    options.packager = options.packager || 'json'
+    options.packager = options.packager || 'php'
 
     this._options = options
 

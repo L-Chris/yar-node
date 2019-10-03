@@ -1185,6 +1185,11 @@ path-key@^2.0.0:
   resolved "https://registry.npmjs.org/path-key/-/path-key-2.0.1.tgz#411cadb574c5a140d3a4b1910d40d80cc9f40b40"
   integrity sha1-QRyttXTFoUDTpLGRDUDYDMn0C0A=
 
+php-serialize@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/php-serialize/-/php-serialize-3.0.0.tgz#b13f1be8f1dab69038a1ddc6ac512336904b50e5"
+  integrity sha512-ny6N+/e7yLV2DDUGWmK25QZ9iPNle7qGKfA0swHOEQ++2/uSTthZF4NaxAywGe6mFUwmN+J94zUsyPAAMFGVrA==
+
 pify@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
