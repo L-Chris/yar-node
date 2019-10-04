@@ -1,5 +1,11 @@
 ## yar-node
 
+### ✨ Features:
+- client[√]
+- server[√]
+- packager: json、php、msgpack[√]
+- protocol: http[√]、tcp[×]、socket[×]
+
 ### Yar Header
 ```C
 typedef struct _yar_header {
