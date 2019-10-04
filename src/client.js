@@ -14,7 +14,7 @@ class YarClient {
 
     this._options = options
 
-    this.packager = new Packager(this._options.packager)
+    this.packager = Packager.get(this._options.packager)
   }
 
   call(mehod, params, callback) {
@@ -37,7 +37,6 @@ class YarClient {
       m: mehod,
       p: params
     }
-
     const packagerNameBuf = Buffer.alloc(8)
     packagerNameBuf.write(this._options.packager, 0, 8, 'utf-8')
     const body = Buffer.from(this.packager.pack(payload))
@@ -52,7 +51,6 @@ class YarClient {
       })
       res.on('end', () => {
         if (!buf.length) return
-        // const reqHeader = protocol.parse(buf)
         const reqBody = buf.slice(82 + packagerNameBuf.length, buf.length)
         const reqPayload = this.packager.unpack(reqBody)
         callback(reqPayload.r)

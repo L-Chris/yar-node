@@ -1,6 +1,10 @@
 const Serialize = require('php-serialize')
 
 class PhpPackager {
+  constructor() {
+    this.name = 'php'
+  }
+
   pack(payload) {
     if (typeof payload !== 'object') {
       throw new Error('payload is not an Object')

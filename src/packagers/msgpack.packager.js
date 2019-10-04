@@ -1,6 +1,10 @@
 const msgpack = require('msgpack')
 
 class MsgpackPackager {
+  constructor() {
+    this.name = 'msgpack'
+  }
+
   pack(payload) {
     if (typeof payload !== 'object') {
       throw new Error('payload is not an Object')

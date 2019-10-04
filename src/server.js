@@ -20,9 +20,8 @@ class YarServer {
 
       req.on('end', () => {
         if (!buf || !buf.length) return
-        // const reqHeader = protocol.parse(buf)
         const packagerName = buf.toString('utf-8', 82, 90).trim().replace(/\0/g, '')
-        const packager = new Packager(packagerName)
+        const packager = Packager.get(packagerName)
 
         const reqBody = buf.slice(90)
         const reqPayload = packager.unpack(reqBody)

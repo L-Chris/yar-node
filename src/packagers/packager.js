@@ -3,18 +3,17 @@ const { PhpPackager } = require('./php.packager')
 const { MsgpackPackager } = require('./msgpack.packager')
 
 class Packager {
-  constructor(type) {
-    switch (type) {
-      case 'json':
-        return new JSONPackager()
-      case 'msgpack':
-        return new MsgpackPackager()
-      case 'php':
-        return new PhpPackager()
-      default:
-        throw new Error('unsupported packger type')
-    }
+  constructor() {
+    this.packagers = [new JSONPackager(), new PhpPackager(), new MsgpackPackager()]
+  }
+
+  get(type) {
+    const packager = this.packagers.find(_ => _.name === type)
+
+    if (!packager) console.warn('unsupported packager')
+
+    return packager
   }
 }
 
-exports.Packager = Packager
+exports.Packager = new Packager()

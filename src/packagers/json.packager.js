@@ -1,5 +1,9 @@
 
 class JSONPackager {
+  constructor() {
+    this.name = 'json'
+  }
+
   pack(payload) {
     if (typeof payload !== 'object') {
       throw new Error('payload is not an Object')
