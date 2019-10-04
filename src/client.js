@@ -2,6 +2,7 @@ const http = require('http')
 const { URL } = require('url')
 const { Packager } = require('./packagers/packager')
 const protocol = require('./protocol')
+const { HEADER_LEN, PACKAGER_NAME_LEN } = require('./const')
 
 class YarClient {
   constructor(uri, options = {}) {
@@ -37,23 +38,30 @@ class YarClient {
       m: mehod,
       p: params
     }
+
+    const packager = this.packager
     const packagerNameBuf = Buffer.alloc(8)
-    packagerNameBuf.write(this._options.packager, 0, 8, 'utf-8')
-    const body = Buffer.from(this.packager.pack(payload))
-    const packetLength = 82 + packagerNameBuf.length + body.length
+    packagerNameBuf.write(this._options.packager, 0, PACKAGER_NAME_LEN, 'utf-8')
+    const body = Buffer.from(packager.pack(payload))
+    const packetLength = HEADER_LEN + PACKAGER_NAME_LEN + body.length
     const header = protocol.render(payload.i, undefined, undefined, packetLength)
     const packet = Buffer.concat([header, packagerNameBuf, body], packetLength)
 
-    const req = http.request(options, res => {
-      let buf = Buffer.alloc(0)
-      res.on('data', chunk => {
-        buf = Buffer.concat([buf, chunk])
-      })
-      res.on('end', () => {
-        if (!buf.length) return
-        const reqBody = buf.slice(82 + packagerNameBuf.length, buf.length)
-        const reqPayload = this.packager.unpack(reqBody)
-        callback(reqPayload.r)
+    const req = http.request(options, function(res) {
+      let resHeader
+
+      res.on('readable', () => {
+        if (!resHeader) {
+          resHeader = res.read(HEADER_LEN)
+        }
+        if (!resHeader) return
+        const parsedResHeader = protocol.parse(resHeader)
+        const resBody = res.read(parsedResHeader.bodyLength)
+
+        if (!resBody) return
+
+        const resPayload = packager.unpack(resBody.slice(PACKAGER_NAME_LEN, resBody.length))
+        callback(resPayload.r)
       })
     })
 

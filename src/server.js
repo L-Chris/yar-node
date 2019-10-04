@@ -1,6 +1,7 @@
 const http = require('http')
 const { Packager } = require('./packagers/packager')
 const protocol = require('./protocol')
+const { HEADER_LEN, PACKAGER_NAME_LEN } = require('./const')
 
 class YarServer {
   constructor(port, methods, options) {
@@ -12,19 +13,26 @@ class YarServer {
 
   init() {
     const server = http.createServer((req, res) => {
-      let buf = Buffer.alloc(0)
+      let reqHeader
 
-      req.on('data', chunk => {
-        buf = Buffer.concat([buf, chunk])
-      })
+      req.on('readable', () => {
+        if (!reqHeader) {
+          reqHeader = req.read(82)
+        }
+        if (!reqHeader) return
+        const parsedReqHeader = protocol.parse(reqHeader)
 
-      req.on('end', () => {
-        if (!buf || !buf.length) return
-        const packagerName = buf.toString('utf-8', 82, 90).trim().replace(/\0/g, '')
+        const reqBody = req.read(parsedReqHeader.bodyLength)
+
+        if (!reqBody) return
+
+        const HEADER_AND_PACKAGER_NAME_LEN = HEADER_LEN + PACKAGER_NAME_LEN
+
+        const packagerNameBuf = reqBody.slice(0, PACKAGER_NAME_LEN)
+        const packagerName = packagerNameBuf.toString('utf-8').trim().replace(/\0/g, '')
         const packager = Packager.get(packagerName)
 
-        const reqBody = buf.slice(90)
-        const reqPayload = packager.unpack(reqBody)
+        const reqPayload = packager.unpack(reqBody.slice(PACKAGER_NAME_LEN, reqBody.length))
 
         const result = this.methods[reqPayload.m](reqPayload.p)
         const payload = {
@@ -35,9 +43,8 @@ class YarServer {
           e: ''
         }
 
-        const packagerNameBuf = buf.slice(82, 90)
         const body = Buffer.from(packager.pack(payload))
-        const packetLength = 82 + packagerNameBuf.length + body.length
+        const packetLength = HEADER_AND_PACKAGER_NAME_LEN + body.length
         const header = protocol.render(payload.i, undefined, undefined, packetLength)
 
         const packet = Buffer.concat([header, packagerNameBuf, body], packetLength)
