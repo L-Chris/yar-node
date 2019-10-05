@@ -1,7 +1,6 @@
 const http = require('http')
-const { Packager } = require('./packagers/packager')
-const protocol = require('./protocol')
-const { HEADER_LEN, PACKAGER_NAME_LEN } = require('./const')
+const { ProtocolDecoder } = require('./protocol/decoder')
+const { ProtocolEncoder } = require('./protocol/encoder')
 
 class YarServer {
   constructor(port, methods, options) {
@@ -13,42 +12,27 @@ class YarServer {
 
   init() {
     const server = http.createServer((req, res) => {
-      let reqHeader
+      const protocolEncoder = new ProtocolEncoder()
+      const protocolDecoder = new ProtocolDecoder()
 
-      req.on('readable', () => {
-        if (!reqHeader) {
-          reqHeader = req.read(82)
-        }
-        if (!reqHeader) return
-        const parsedReqHeader = protocol.parse(reqHeader)
+      req.pipe(protocolDecoder)
 
-        const reqBody = req.read(parsedReqHeader.bodyLength)
+      protocolEncoder.pipe(res)
 
-        if (!reqBody) return
+      protocolDecoder.on('request', obj => {
+        const {
+          m: method,
+          p: params
+        } = obj.data
 
-        const HEADER_AND_PACKAGER_NAME_LEN = HEADER_LEN + PACKAGER_NAME_LEN
+        const result = this.methods[method](params)
 
-        const packagerNameBuf = reqBody.slice(0, PACKAGER_NAME_LEN)
-        const packagerName = packagerNameBuf.toString('utf-8').trim().replace(/\0/g, '')
-        const packager = Packager.get(packagerName)
+        protocolEncoder.writeResponse({
+          id: Math.floor(Math.random() * 10e6),
+          packager: obj.packagerName,
+          result
+        })
 
-        const reqPayload = packager.unpack(reqBody.slice(PACKAGER_NAME_LEN, reqBody.length))
-
-        const result = this.methods[reqPayload.m](reqPayload.p)
-        const payload = {
-          i: Math.floor(Math.random() * 10e6),
-          s: 0,
-          r: result,
-          o: '',
-          e: ''
-        }
-
-        const body = Buffer.from(packager.pack(payload))
-        const packetLength = HEADER_AND_PACKAGER_NAME_LEN + body.length
-        const header = protocol.render(payload.i, undefined, undefined, packetLength)
-
-        const packet = Buffer.concat([header, packagerNameBuf, body], packetLength)
-        res.write(packet)
         res.end()
       })
     })

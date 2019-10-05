@@ -1,8 +1,8 @@
 const http = require('http')
 const { URL } = require('url')
 const { Packager } = require('./packagers/packager')
-const protocol = require('./protocol')
-const { HEADER_LEN, PACKAGER_NAME_LEN } = require('./const')
+const { ProtocolDecoder } = require('./protocol/decoder')
+const { ProtocolEncoder } = require('./protocol/encoder')
 
 class YarClient {
   constructor(uri, options = {}) {
@@ -10,15 +10,12 @@ class YarClient {
 
     this._uri = uriOptions
     this._protocol = uriOptions.protocol
-
     options.packager = options.packager || 'php'
-
     this._options = options
-
     this.packager = Packager.get(this._options.packager)
   }
 
-  call(mehod, params, callback) {
+  call(method, params, callback) {
     const options = {
       hostname: this._uri.hostname,
       port: this._uri.port,
@@ -33,39 +30,25 @@ class YarClient {
       }
     }
 
-    const payload = {
-      i: Math.floor(Math.random() * 10e6),
-      m: mehod,
-      p: params
-    }
-
-    const packager = this.packager
-    const packagerNameBuf = Buffer.alloc(8)
-    packagerNameBuf.write(this._options.packager, 0, PACKAGER_NAME_LEN, 'utf-8')
-    const body = Buffer.from(packager.pack(payload))
-    const packetLength = HEADER_LEN + PACKAGER_NAME_LEN + body.length
-    const header = protocol.render(payload.i, undefined, undefined, packetLength)
-    const packet = Buffer.concat([header, packagerNameBuf, body], packetLength)
+    const protocolEncoder = new ProtocolEncoder()
+    const protocolDecoder = new ProtocolDecoder()
 
     const req = http.request(options, function(res) {
-      let resHeader
-
-      res.on('readable', () => {
-        if (!resHeader) {
-          resHeader = res.read(HEADER_LEN)
-        }
-        if (!resHeader) return
-        const parsedResHeader = protocol.parse(resHeader)
-        const resBody = res.read(parsedResHeader.bodyLength)
-
-        if (!resBody) return
-
-        const resPayload = packager.unpack(resBody.slice(PACKAGER_NAME_LEN, resBody.length))
-        callback(resPayload.r)
-      })
+      res.pipe(protocolDecoder)
     })
 
-    req.write(packet)
+    protocolEncoder.pipe(req)
+
+    protocolEncoder.writeRequest({
+      id: Math.floor(Math.random() * 10e6),
+      packager: this._options.packager,
+      method,
+      params
+    })
+
+    protocolDecoder.on('response', res => {
+      callback(res.data.r)
+    })
 
     req.end()
   }
