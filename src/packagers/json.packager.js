@@ -1,4 +1,3 @@
-
 class JSONPackager {
   constructor() {
     this.name = 'json'
