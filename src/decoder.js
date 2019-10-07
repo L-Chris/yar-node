@@ -1,6 +1,6 @@
 const { Writable } = require('stream')
-const { HEADER_LEN, PACKAGER_NAME_LEN } = require('../const')
-const { Packager } = require('../packagers/packager')
+const protocol = require('./protocol')
+const { HEADER_LEN } = require('./const')
 
 class ProtocolDecoder extends Writable {
   constructor(options = {}) {
@@ -28,23 +28,10 @@ class ProtocolDecoder extends Writable {
     }
 
     const packet = this._buf.slice(0, packetLength)
-    const packagerName = packet.slice(HEADER_LEN, HEADER_LEN + PACKAGER_NAME_LEN).toString('utf-8').trim().replace(/\0/g, '')
-    const packager = Packager.get(packagerName)
-    const data = packager.unpack(packet.slice(HEADER_LEN + PACKAGER_NAME_LEN, packetLength))
-    const obj = {
-      id: packet.readInt32BE(0),
-      version: packet.readUInt16BE(4),
-      magicNumber: packet.readUInt32BE(6),
-      reserved: packet.readUInt32BE(10),
-      bodyLength,
-      packagerName,
-      data
-    }
-
-    this.emit(data.m ? 'request' : 'response', obj)
+    const obj = protocol.decode(packet, this.options)
+    this.emit(obj.body.m ? 'request' : 'response', obj)
 
     const restLength = bufLength - packetLength
-
     if (restLength) {
       this._buf = this._buf.slice(packetLength)
       return true

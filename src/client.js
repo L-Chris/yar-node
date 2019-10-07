@@ -1,8 +1,9 @@
 const http = require('http')
 const { URL } = require('url')
 const { Packager } = require('./packagers/packager')
-const { ProtocolDecoder } = require('./protocol/decoder')
-const { ProtocolEncoder } = require('./protocol/encoder')
+const { ProtocolDecoder } = require('./decoder')
+const { ProtocolEncoder } = require('./encoder')
+const { nextId } = require('./utils')
 
 class YarClient {
   constructor(uri, options = {}) {
@@ -15,7 +16,7 @@ class YarClient {
     this.packager = Packager.get(this._options.packager)
   }
 
-  call(method, params, callback) {
+  call(methodName, args, callback) {
     const options = {
       hostname: this._uri.hostname,
       port: this._uri.port,
@@ -39,19 +40,23 @@ class YarClient {
 
     protocolEncoder.pipe(req)
 
-    protocolEncoder.writeRequest({
-      id: Math.floor(Math.random() * 10e6),
+    const id = nextId()
+
+    protocolEncoder.writeRequest(id, {
       packager: this._options.packager,
-      method,
-      params
+      methodName,
+      args,
+      timeout: 3000
     })
 
     protocolDecoder.on('response', res => {
-      callback(res.data.r)
+      callback(res.body.r)
     })
 
     req.end()
   }
+
+  setOpt() {}
 }
 
 exports.YarClient = YarClient

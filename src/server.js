@@ -1,6 +1,6 @@
 const http = require('http')
-const { ProtocolDecoder } = require('./protocol/decoder')
-const { ProtocolEncoder } = require('./protocol/encoder')
+const { ProtocolDecoder } = require('./decoder')
+const { ProtocolEncoder } = require('./encoder')
 
 class YarServer {
   constructor(methods) {
@@ -19,16 +19,14 @@ class YarServer {
 
       protocolDecoder.on('request', obj => {
         const {
-          m: method,
-          p: params
-        } = obj.data
+          m: methodName,
+          p: args
+        } = obj.body
 
-        const result = this.methods[method](params)
-
-        protocolEncoder.writeResponse({
-          id: Math.floor(Math.random() * 10e6),
+        const data = this.methods[methodName](args)
+        protocolEncoder.writeResponse(obj, {
           packager: obj.packagerName,
-          result
+          data
         })
 
         res.end()

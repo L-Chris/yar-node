@@ -6,6 +6,30 @@
 - packager: json[√]、php[√]、msgpack[√]
 - protocol: http[√]、tcp[×]、socket[×]
 
+### Server
+```javascript
+const { YarServer } = require('yar-node')
+
+class API {
+  some_method(args) {}
+}
+
+const server = new YarServer(new API())
+
+server.handle()
+```
+
+### Client
+```javascript
+const { YarClient } = require('yar-node')
+
+const client = new YarClient('http://host/api/')
+
+client.call('some_method', { name: 'Chris' }, res => {
+  console.log(`reponse:${res}`)
+})
+```
+
 ### Yar Header
 ```C
 typedef struct _yar_header {
