@@ -1,12 +1,12 @@
-const { Packager } = require('./packagers/packager')
-const { HEADER_LEN, PACKAGER_NAME_LEN } = require('./const')
+import { getPackager } from './packagers'
+import { HEADER_LEN, PACKAGER_NAME_LEN } from './const'
 
 const YAR_PROTOCOL_MAGIC_NUM = 0x80DFEC60
 const YAR_PROTOCOL_VERSION = 0
 const YAR_PROTOCOL_RESERVED = 0
 
-const encode = (obj, options = {}) => {
-  const packager = Packager.get(obj.packager)
+const encode = (obj) => {
+  const packager = getPackager(obj.packager)
   const packagerNameBuf = Buffer.alloc(8)
   packagerNameBuf.write(obj.packager, 0, PACKAGER_NAME_LEN, 'utf-8')
   const body = Buffer.from(packager.pack(obj.payload))
@@ -28,7 +28,7 @@ const encode = (obj, options = {}) => {
   return Buffer.concat([header, packagerNameBuf, body], HEADER_LEN + PACKAGER_NAME_LEN + body.length)
 }
 
-const decode = (buf, options = {}) => {
+const decode = (buf: Buffer) => {
   const id = buf.readUInt32BE(0)
   const protocolVersion = buf.readUInt16BE(4)
   const magicNumber = buf.readUInt32BE(6)
@@ -36,7 +36,7 @@ const decode = (buf, options = {}) => {
   const bodyLength = buf.readUInt32BE(78)
 
   const packagerName = buf.slice(HEADER_LEN, HEADER_LEN + PACKAGER_NAME_LEN).toString('utf-8').trim().replace(/\0/g, '')
-  const packager = Packager.get(packagerName)
+  const packager = getPackager(packagerName)
   const body = packager.unpack(buf.slice(HEADER_LEN + PACKAGER_NAME_LEN, HEADER_LEN + bodyLength))
 
   return {
@@ -50,7 +50,7 @@ const decode = (buf, options = {}) => {
   }
 }
 
-const requestEncode = (id, req, options) => {
+const requestEncode = (id: Number, req) => {
   const payload = {
     i: id,
     m: req.methodName,
@@ -66,7 +66,7 @@ const requestEncode = (id, req, options) => {
   })
 }
 
-const responseEncode = (id, res, options) => {
+const responseEncode = (id: Number, res) => {
   const payload = {
     i: id,
     s: res.status || 0,
@@ -84,9 +84,9 @@ const responseEncode = (id, res, options) => {
   })
 }
 
-
-
-exports.requestEncode = requestEncode
-exports.responseEncode = responseEncode
-exports.encode = encode
-exports.decode = decode
+export default {
+  requestEncode,
+  responseEncode,
+  encode,
+  decode
+}

@@ -1,14 +1,19 @@
-const http = require('http')
-const { ProtocolDecoder } = require('./decoder')
-const { ProtocolEncoder } = require('./encoder')
+import * as http from 'http'
+import { ProtocolDecoder } from './decoder'
+import { ProtocolEncoder } from './encoder'
 
 class YarServer {
-  constructor(methods) {
+  methods: Object;
+  port: Number;
+  server: http.Server;
+  constructor(methods, options = {}) {
     this.methods = methods
-    this.port = 3000
+    this.port = options.port || 3000
+
+    this.init()
   }
 
-  handle() {
+  init() {
     const server = http.createServer((req, res) => {
       const protocolEncoder = new ProtocolEncoder()
       const protocolDecoder = new ProtocolDecoder()
@@ -17,13 +22,13 @@ class YarServer {
 
       protocolEncoder.pipe(res)
 
-      protocolDecoder.on('request', obj => {
+      protocolDecoder.on('request', async (obj) => {
         const {
           m: methodName,
           p: args
         } = obj.body
 
-        const data = this.methods[methodName](args)
+        const data = await this.methods[methodName](args)
         protocolEncoder.writeResponse(obj, {
           packager: obj.packagerName,
           data
@@ -37,10 +42,14 @@ class YarServer {
       console.log(`listening on http://127.0.0.1:${this.port}`)
     })
 
-    server.listen(this.port)
-
     this.server = server
+  }
+
+  handle() {
+    this.server.listen(this.port)
   }
 }
 
-exports.YarServer = YarServer
+export {
+  YarServer
+}

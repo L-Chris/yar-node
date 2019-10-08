@@ -1,8 +1,11 @@
-const { Transform } = require('stream')
-const protocol = require('./protocol')
-const { noop } = require('./utils')
+import { Transform } from 'stream'
+import protocol from './protocol'
+import { noop } from './utils'
 
 class ProtocolEncoder extends Transform {
+  _limited: Boolean;
+  _queue: Array<[any, Function]>;
+  options: Object;
   constructor(options = {}) {
     super(options)
     this.options = options
@@ -23,7 +26,7 @@ class ProtocolEncoder extends Transform {
     })
   }
 
-  writeRequest(id, req, callback = noop) {
+  writeRequest(id: Number, req, callback = noop) {
     this._writePacket({
       packetId: id,
       packetType: 'request',
@@ -40,7 +43,7 @@ class ProtocolEncoder extends Transform {
     }, callback)
   }
 
-  _writePacket(packet, callback) {
+  _writePacket(packet, callback: Function) {
     if (this._limited) {
       this._queue.push([packet, callback])
     } else {
@@ -72,9 +75,11 @@ class ProtocolEncoder extends Transform {
     return protocol.responseEncode(packetId, res)
   }
 
-  _transform(chunk, encoding, callback) {
+  _transform(chunk: Buffer, encoding: String, callback: Function) {
     callback(null, chunk)
   }
 }
 
-exports.ProtocolEncoder = ProtocolEncoder
+export {
+  ProtocolEncoder
+}

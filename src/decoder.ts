@@ -1,8 +1,10 @@
-const { Writable } = require('stream')
-const protocol = require('./protocol')
-const { HEADER_LEN } = require('./const')
+import { Writable } from 'stream'
+import protocol from './protocol'
+import { HEADER_LEN } from './const'
 
 class ProtocolDecoder extends Writable {
+  _buf: Buffer;
+  options: Object;
   constructor(options = {}) {
     super(options = {})
 
@@ -10,7 +12,7 @@ class ProtocolDecoder extends Writable {
     this.options = options
   }
 
-  _write(chunk, encoding, callback) {
+  _write(chunk: Buffer, encoding: string, callback: Function) {
     this._buf = this._buf ? Buffer.concat([this._buf, chunk]) : chunk
     let unfinish = false
     do {
@@ -46,4 +48,6 @@ class ProtocolDecoder extends Writable {
   }
 }
 
-exports.ProtocolDecoder = ProtocolDecoder
+export {
+  ProtocolDecoder
+}

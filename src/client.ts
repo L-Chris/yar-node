@@ -1,22 +1,26 @@
-const http = require('http')
-const { URL } = require('url')
-const { Packager } = require('./packagers/packager')
-const { ProtocolDecoder } = require('./decoder')
-const { ProtocolEncoder } = require('./encoder')
-const { nextId } = require('./utils')
+import * as http from 'http'
+import { URL } from 'url'
+import { getPackager } from './packagers'
+import { ProtocolDecoder } from './decoder'
+import { ProtocolEncoder } from './encoder'
+import { nextId } from './utils'
 
 class YarClient {
-  constructor(uri, options = {}) {
+  _uri: URL;
+  _protocol: String;
+  _options: any;
+  packager: PackagerInterface;
+  constructor(uri: string, options = {}) {
     const uriOptions = new URL(uri)
 
     this._uri = uriOptions
     this._protocol = uriOptions.protocol
     options.packager = options.packager || 'php'
     this._options = options
-    this.packager = Packager.get(this._options.packager)
+    this.packager = getPackager(this._options.packager)
   }
 
-  call(methodName, args, callback) {
+  call(methodName: String, args: any, callback: Function) {
     const options = {
       hostname: this._uri.hostname,
       port: this._uri.port,
@@ -59,4 +63,6 @@ class YarClient {
   setOpt() {}
 }
 
-exports.YarClient = YarClient
+export {
+  YarClient
+}

@@ -4,7 +4,13 @@
   "main": "src/index.js",
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "^1.19.2"
+    "@types/msgpack": "^0.0.30",
+    "@types/node": "^12.7.11",
+    "nodemon": "^1.19.2",
+    "ts-node": "^8.4.1",
+    "tsc-watch": "^4.0.0",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "byte": "^2.0.0",
