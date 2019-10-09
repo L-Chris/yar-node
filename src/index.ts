@@ -1,5 +1,5 @@
-import { YarClient } from '../src/client';
-import { YarServer } from '../src/server';
+import { YarClient } from './client';
+import { YarServer } from './server';
 
 export {
   YarClient,

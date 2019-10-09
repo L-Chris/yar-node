@@ -4,30 +4,30 @@
 - client[√]
 - server[√]
 - packager: json[√]、php[√]、msgpack[√]
-- protocol: http[√]、tcp[×]、socket[×]
+- protocol: http[√]、tcp[×]、unix[×]
 
 ### Server
 ```javascript
-const { YarServer } = require('yar-node')
+const { YarServer } = require('yar-node');
 
 class API {
-  some_method(args) {}
+  someMethod(args) {}
 }
 
-const server = new YarServer(new API())
+const server = new YarServer(new API());
 
-server.handle()
+server.handle();
 ```
 
 ### Client
 ```javascript
-const { YarClient } = require('yar-node')
+const { YarClient } = require('yar-node');
 
-const client = new YarClient('http://host/api/')
+const client = new YarClient('http://host/api/');
 
-client.call('some_method', { name: 'Chris' }, res => {
-  console.log(`reponse:${res}`)
-})
+client.call('someMethod', { name: 'Chris' }, res => {
+  console.log(`reponse:${res}`);
+});
 ```
 
 ### Yar Header

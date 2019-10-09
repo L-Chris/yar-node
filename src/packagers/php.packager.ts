@@ -1,4 +1,4 @@
-import Serialize from 'php-serialize';
+import * as Serialize from 'php-serialize';
 
 class PhpPackager implements PackagerInterface {
   type: string;

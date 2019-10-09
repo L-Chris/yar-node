@@ -1,6 +1,6 @@
 {
   "name": "yar-node",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/index.js",
   "author": "Jiahui.liang <563303226@QQ.COM>",
   "repository": "https://github.com/L-Chris/yar-node",
