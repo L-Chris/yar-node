@@ -17,10 +17,15 @@ interface YarRequest {
   methodName: string;
   args: any;
   timeout: number;
+  token?: string;
+  provider?: string;
 }
 
 interface YarResponse {
+  token?: string;
+  provider?: string;
   packager: string;
+  status?: number;
   data: any;
 }
 
@@ -40,9 +45,9 @@ interface ReponsePayload {
 
 interface YarPacket {
   id: number;
-  protocolVersion?: string;
+  protocolVersion?: number;
   magicNumber?: number;
-  reserved?: string;
+  reserved?: number;
   token?: string;
   provider?: string;
   packager: string;

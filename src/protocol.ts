@@ -28,7 +28,7 @@ const encode = (obj: YarPacket) => {
   return Buffer.concat([header, packagerNameBuf, body], HEADER_LEN + PACKAGER_NAME_LEN + body.length)
 }
 
-const decode = (buf: Buffer) => {
+const decode = (buf: Buffer): YarPacket => {
   const id = buf.readUInt32BE(0)
   const protocolVersion = buf.readUInt16BE(4)
   const magicNumber = buf.readUInt32BE(6)
@@ -50,7 +50,7 @@ const decode = (buf: Buffer) => {
   }
 }
 
-const requestEncode = (id: number, req) => {
+const requestEncode = (id: number, req: YarRequest) => {
   const body = {
     i: id,
     m: req.methodName,
@@ -66,7 +66,7 @@ const requestEncode = (id: number, req) => {
   })
 }
 
-const responseEncode = (id: number, res) => {
+const responseEncode = (id: number, res: YarResponse) => {
   const body = {
     i: id,
     s: res.status || 0,

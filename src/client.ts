@@ -58,8 +58,8 @@ class YarClient {
       timeout: 3000
     })
 
-    protocolDecoder.on('response', res => {
-      callback(res.body.r)
+    protocolDecoder.on('response', (res: YarPacket) => {
+      'r' in res.body && callback(res.body.r)
     })
 
     req.end()
