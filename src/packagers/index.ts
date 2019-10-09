@@ -1,17 +1,19 @@
-import { JSONPackager } from './json.packager'
-import { PhpPackager } from './php.packager'
-import { MsgpackPackager } from './msgpack.packager'
+import { JSONPackager } from './json.packager';
+import { PhpPackager } from './php.packager';
+import { MsgpackPackager } from './msgpack.packager';
 
-const packagers = [new JSONPackager(), new PhpPackager(), new MsgpackPackager()]
+const packagers = [new JSONPackager(), new PhpPackager(), new MsgpackPackager()];
 
 function getPackager(type: string) {
-  const packager = packagers.find(_ => _.name === type)
+  const packager = packagers.find(_ => _.type === type);
 
-  if (!packager) console.warn('unsupported packager')
+  if (!packager) {
+    throw new Error('unsupported packager');
+  }
 
-  return packager
+  return packager;
 }
 
 export {
-  getPackager
-}
+  getPackager,
+};

@@ -1,26 +1,26 @@
-import Serialize from 'php-serialize'
+import Serialize from 'php-serialize';
 
 class PhpPackager implements PackagerInterface {
-  name: string;
+  type: string;
   constructor() {
-    this.name = 'php';
+    this.type = 'php';
   }
 
-  pack(payload: Object) {
+  pack(payload: object) {
     if (typeof payload !== 'object') {
-      throw new Error('payload is not an Object');
+      throw new Error('payload is not an object');
     }
     return Serialize.serialize(payload);
   }
 
   unpack(packet: Buffer) {
     if (!Buffer.isBuffer(packet)) {
-      throw new Error('packet it not a Buffer Object');
+      throw new Error('packet it not a Buffer object');
     }
     return Serialize.unserialize(packet);
   }
 }
 
 export {
-  PhpPackager
-}
+  PhpPackager,
+};

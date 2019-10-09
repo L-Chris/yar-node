@@ -1,26 +1,26 @@
-import * as msgpack from 'msgpack'
+import * as msgpack from 'msgpack';
 
 class MsgpackPackager implements PackagerInterface {
-  name: string;
+  type: string;
   constructor() {
-    this.name = 'msgpack';
+    this.type = 'msgpack';
   }
 
-  pack(payload: Object) {
+  pack(payload: object) {
     if (typeof payload !== 'object') {
-      throw new Error('payload is not an Object');
+      throw new Error('payload is not an object');
     }
     return msgpack.pack(payload);
   }
 
   unpack(packet: Buffer) {
     if (!Buffer.isBuffer(packet)) {
-      throw new Error('packet it not a Buffer Object');
+      throw new Error('packet it not a Buffer object');
     }
     return msgpack.unpack(packet);
   }
 }
 
 export {
-  MsgpackPackager
-}
+  MsgpackPackager,
+};

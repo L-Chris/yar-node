@@ -1,7 +1,7 @@
-const HEADER_LEN = 82
-const PACKAGER_NAME_LEN = 8
+const HEADER_LEN = 82;
+const PACKAGER_NAME_LEN = 8;
 
 export {
   HEADER_LEN,
-  PACKAGER_NAME_LEN
-}
+  PACKAGER_NAME_LEN,
+};

@@ -1,53 +1,53 @@
-import { Writable } from 'stream'
-import protocol from './protocol'
-import { HEADER_LEN } from './const'
+import { Writable } from 'stream';
+import protocol from './protocol';
+import { HEADER_LEN } from './const';
 
 class ProtocolDecoder extends Writable {
-  _buf: Buffer;
-  options: Object;
+  private buf: Buffer;
+  private options: object;
   constructor(options = {}) {
-    super(options = {})
+    super(options = {});
 
-    this._buf = null
-    this.options = options
+    this.buf = null;
+    this.options = options;
   }
 
-  _write(chunk: Buffer, encoding: string, callback: Function) {
-    this._buf = this._buf ? Buffer.concat([this._buf, chunk]) : chunk
-    let unfinish = false
+  _write(chunk: Buffer, encoding: string, callback: () => void) {
+    this.buf = this.buf ? Buffer.concat([this.buf, chunk]) : chunk;
+    let unfinish = false;
     do {
-      unfinish = this._decode()
-    } while(unfinish)
-    callback()
+      unfinish = this._decode();
+    } while (unfinish);
+    callback();
   }
 
   _decode() {
-    const bufLength = this._buf.length
-    const bodyLength = this._buf.readInt32BE(78)
-    const packetLength = HEADER_LEN + bodyLength
+    const bufLength = this.buf.length;
+    const bodyLength = this.buf.readInt32BE(78);
+    const packetLength = HEADER_LEN + bodyLength;
     if (packetLength === 0 || bufLength < packetLength) {
-      return false
+      return false;
     }
 
-    const packet = this._buf.slice(0, packetLength)
-    const obj = protocol.decode(packet)
-    this.emit('m' in obj.body ? 'request' : 'response', obj)
+    const packet = this.buf.slice(0, packetLength);
+    const obj = protocol.decode(packet);
+    this.emit(obj.body.m ? 'request' : 'response', obj);
 
-    const restLength = bufLength - packetLength
+    const restLength = bufLength - packetLength;
     if (restLength) {
-      this._buf = this._buf.slice(packetLength)
-      return true
+      this.buf = this.buf.slice(packetLength);
+      return true;
     }
-    this._buf = null
-    return false
+    this.buf = null;
+    return false;
   }
 
   _destroy() {
-    this._buf = null
-    this.emit('close')
+    this.buf = null;
+    this.emit('close');
   }
 }
 
 export {
-  ProtocolDecoder
-}
+  ProtocolDecoder,
+};

@@ -1,7 +1,7 @@
 interface PackagerInterface {
-  name: string;
-  pack(payload: Object): string;
-  unpack(packet: Buffer): Object;
+  type: string;
+  pack(payload: object): string;
+  unpack(packet: Buffer): object;
 }
 
 interface Packet {
@@ -29,16 +29,16 @@ interface YarResponse {
   data: any;
 }
 
-interface RequestPayload {
+interface RequestBody {
   i: number;
   m: string;
   p: any;
 }
 
-interface ReponsePayload {
+interface ReponseBody {
   i: number;
   s: number;
-  r: Object;
+  r: object;
   o: string;
   e: string;
 }
@@ -51,6 +51,14 @@ interface YarPacket {
   token?: string;
   provider?: string;
   packager: string;
-  body: RequestPayload | ReponsePayload;
+  body: any;
   bodyLength?: number;
+}
+
+interface YarRequestPacket extends YarPacket {
+  body: RequestBody;
+}
+
+interface YarResponsePacket extends YarPacket {
+  body: ReponseBody;
 }

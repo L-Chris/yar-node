@@ -1,24 +1,24 @@
 class JSONPackager implements PackagerInterface {
-  name: string;
+  type: string;
   constructor() {
-    this.name = 'json';
+    this.type = 'json';
   }
 
-  pack(payload: Object) {
+  pack(payload: object) {
     if (typeof payload !== 'object') {
-      throw new Error('payload is not an Object');
+      throw new Error('payload is not an object');
     }
     return JSON.stringify(payload);
   }
 
   unpack(packet: Buffer) {
     if (!Buffer.isBuffer(packet)) {
-      throw new Error('packet it not a Buffer Object');
+      throw new Error('packet it not a Buffer object');
     }
     return JSON.parse(packet.toString('utf-8'));
   }
 }
 
 export {
-  JSONPackager
-}
+  JSONPackager,
+};

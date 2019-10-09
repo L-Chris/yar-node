@@ -1,73 +1,75 @@
-import * as http from 'http'
-import { URL } from 'url'
-import { getPackager } from './packagers'
-import { ProtocolDecoder } from './decoder'
-import { ProtocolEncoder } from './encoder'
-import { nextId } from './utils'
+import * as http from 'http';
+import { URL } from 'url';
+import { getPackager } from './packagers';
+import { ProtocolDecoder } from './decoder';
+import { ProtocolEncoder } from './encoder';
+import { nextId } from './utils';
 
 export interface YarClientOptions {
-  packager?: string
+  packager?: string;
 }
 
 class YarClient {
-  _uri: URL;
-  _protocol: string;
-  _options: any;
-  packager: PackagerInterface;
+  private uri: URL;
+  private protocol: string;
+  private options: any;
+  private packager: PackagerInterface;
   constructor(uri: string, options: YarClientOptions = {}) {
-    const uriOptions = new URL(uri)
+    const uriOptions = new URL(uri);
 
-    this._uri = uriOptions
-    this._protocol = uriOptions.protocol
-    options.packager = options.packager || 'php'
-    this._options = options
-    this.packager = getPackager(this._options.packager)
+    this.uri = uriOptions;
+    this.protocol = uriOptions.protocol;
+    options.packager = options.packager || 'php';
+    this.options = options;
+    this.packager = getPackager(this.options.packager);
   }
 
-  call(methodName: string, args: any, callback: Function) {
+  call(methodName: string, args: any, callback: (o: object) => void) {
     const options = {
-      hostname: this._uri.hostname,
-      port: this._uri.port,
-      path: this._uri.pathname,
-      protocol: this._uri.protocol,
+      hostname: this.uri.hostname,
+      port: this.uri.port,
+      path: this.uri.pathname,
+      protocol: this.uri.protocol,
       headers: {
         'User-Agent': `PHP Yar Rpc-0.0.1`,
         'Content-Type': 'application/octet-stream',
         'Transfer-Encoding': 'chunked',
         'Connection': 'Keep-Alive',
-        'Keep-Alive': '300'
-      }
-    }
+        'Keep-Alive': '300',
+      },
+    };
 
-    const protocolEncoder = new ProtocolEncoder()
-    const protocolDecoder = new ProtocolDecoder()
+    const protocolEncoder = new ProtocolEncoder();
+    const protocolDecoder = new ProtocolDecoder();
 
-    const req = http.request(options, function(res) {
-      res.pipe(protocolDecoder)
-    })
+    const req = http.request(options, res => {
+      res.pipe(protocolDecoder);
+    });
 
-    protocolEncoder.pipe(req)
+    protocolEncoder.pipe(req);
 
-    const id = nextId()
+    const id = nextId();
 
     protocolEncoder.writeRequest({
       id,
-      packager: this._options.packager,
+      packager: this.options.packager,
       methodName,
       args,
-      timeout: 3000
-    })
+      timeout: 3000,
+    });
 
-    protocolDecoder.on('response', (res: YarPacket) => {
-      'r' in res.body && callback(res.body.r)
-    })
+    protocolDecoder.on('response', (res: YarResponsePacket) => {
+      callback(res.body.r);
+    });
 
-    req.end()
+    req.end();
   }
 
-  setOpt() {}
+  setOpt(key: string, value: any) {
+    this.options[key] = value;
+  }
 }
 
 export {
-  YarClient
-}
+  YarClient,
+};
