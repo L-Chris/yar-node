@@ -4,7 +4,7 @@ import { noop } from './utils'
 
 class ProtocolEncoder extends Transform {
   _limited: Boolean;
-  _queue: Array<[any, Function]>;
+  _queue: Array<[Packet, Function]>;
   options: Object;
   constructor(options = {}) {
     super(options)
@@ -26,15 +26,15 @@ class ProtocolEncoder extends Transform {
     })
   }
 
-  writeRequest(id: Number, req, callback = noop) {
+  writeRequest(req: YarRequest, callback = noop) {
     this._writePacket({
-      packetId: id,
+      packetId: req.id,
       packetType: 'request',
       req,
     }, callback)
   }
 
-  writeResponse(req, res, callback = noop) {
+  writeResponse(req: YarRequest, res, callback = noop) {
     this._writePacket({
       packetId: req.id,
       packetType: 'response',
@@ -43,13 +43,18 @@ class ProtocolEncoder extends Transform {
     }, callback)
   }
 
-  _writePacket(packet, callback: Function) {
+  _writePacket(packet: Packet, callback: Function) {
     if (this._limited) {
       this._queue.push([packet, callback])
     } else {
-      let buf;
+      let buf: null | Buffer;
       try {
-        buf = this['_' + packet.packetType + 'Encode'](packet);
+        if (packet.packetType === 'request') {
+          buf = this._requestEncode(packet);
+        } else {
+          buf = this._responseEncode(packet);
+        }
+
       } catch (err) {
         return callback(err, packet);
       }
@@ -63,19 +68,19 @@ class ProtocolEncoder extends Transform {
     }
   }
 
-  _requestEncode(packet) {
+  _requestEncode(packet: Packet) {
     const { packetId, req } = packet
 
     return protocol.requestEncode(packetId, req)
   }
 
-  _responseEncode(packet) {
+  _responseEncode(packet: Packet) {
     const { packetId, res } = packet
 
     return protocol.responseEncode(packetId, res)
   }
 
-  _transform(chunk: Buffer, encoding: String, callback: Function) {
+  _transform(chunk: Buffer, encoding: string, callback: Function) {
     callback(null, chunk)
   }
 }

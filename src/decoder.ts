@@ -30,7 +30,7 @@ class ProtocolDecoder extends Writable {
     }
 
     const packet = this._buf.slice(0, packetLength)
-    const obj = protocol.decode(packet, this.options)
+    const obj = protocol.decode(packet)
     this.emit(obj.body.m ? 'request' : 'response', obj)
 
     const restLength = bufLength - packetLength

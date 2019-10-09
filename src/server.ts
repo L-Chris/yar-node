@@ -2,11 +2,19 @@ import * as http from 'http'
 import { ProtocolDecoder } from './decoder'
 import { ProtocolEncoder } from './encoder'
 
+interface YarServerOptions {
+  port?: number;
+}
+
+interface YarServerApi {
+  [key: string]: Function
+}
+
 class YarServer {
   methods: Object;
-  port: Number;
+  port: number;
   server: http.Server;
-  constructor(methods, options = {}) {
+  constructor(methods: YarServerApi, options: YarServerOptions = {}) {
     this.methods = methods
     this.port = options.port || 3000
 
@@ -30,7 +38,7 @@ class YarServer {
 
         const data = await this.methods[methodName](args)
         protocolEncoder.writeResponse(obj, {
-          packager: obj.packagerName,
+          packager: obj.packager,
           data
         })
 

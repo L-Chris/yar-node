@@ -1,5 +1,5 @@
 class JSONPackager implements PackagerInterface {
-  name: String;
+  name: string;
   constructor() {
     this.name = 'json';
   }

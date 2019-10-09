@@ -5,12 +5,16 @@ import { ProtocolDecoder } from './decoder'
 import { ProtocolEncoder } from './encoder'
 import { nextId } from './utils'
 
+export interface YarClientOptions {
+  packager?: string
+}
+
 class YarClient {
   _uri: URL;
-  _protocol: String;
+  _protocol: string;
   _options: any;
   packager: PackagerInterface;
-  constructor(uri: string, options = {}) {
+  constructor(uri: string, options: YarClientOptions = {}) {
     const uriOptions = new URL(uri)
 
     this._uri = uriOptions
@@ -20,7 +24,7 @@ class YarClient {
     this.packager = getPackager(this._options.packager)
   }
 
-  call(methodName: String, args: any, callback: Function) {
+  call(methodName: string, args: any, callback: Function) {
     const options = {
       hostname: this._uri.hostname,
       port: this._uri.port,
@@ -46,7 +50,8 @@ class YarClient {
 
     const id = nextId()
 
-    protocolEncoder.writeRequest(id, {
+    protocolEncoder.writeRequest({
+      id,
       packager: this._options.packager,
       methodName,
       args,

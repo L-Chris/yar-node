@@ -4,7 +4,7 @@ import { MsgpackPackager } from './msgpack.packager'
 
 const packagers = [new JSONPackager(), new PhpPackager(), new MsgpackPackager()]
 
-function getPackager(type: String) {
+function getPackager(type: string) {
   const packager = packagers.find(_ => _.name === type)
 
   if (!packager) console.warn('unsupported packager')
