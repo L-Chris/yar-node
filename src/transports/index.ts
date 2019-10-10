@@ -8,14 +8,14 @@ function getTransport(protocol: string) {
   switch (protocol) {
     case 'http:':
       return httpTransport;
-    case 'tcp':
-    case 'unix':
+    case 'tcp:':
+    case 'unix:':
       return socketTransport;
     default:
-      throw new Error('unsupported transport')
+      throw new Error('unsupported transport');
   }
 }
 
 export {
-  getTransport
-}
+  getTransport,
+};

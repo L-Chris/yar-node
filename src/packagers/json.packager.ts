@@ -1,4 +1,4 @@
-class JSONPackager implements PackagerInterface {
+class JSONPackager implements YarPackager {
   type: string;
   constructor() {
     this.type = 'json';

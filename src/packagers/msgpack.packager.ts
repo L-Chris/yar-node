@@ -1,6 +1,6 @@
 import * as msgpack from 'msgpack';
 
-class MsgpackPackager implements PackagerInterface {
+class MsgpackPackager implements YarPackager {
   type: string;
   constructor() {
     this.type = 'msgpack';

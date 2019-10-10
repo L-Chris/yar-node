@@ -1,6 +1,6 @@
 import * as Serialize from 'php-serialize';
 
-class PhpPackager implements PackagerInterface {
+class PhpPackager implements YarPackager {
   type: string;
   constructor() {
     this.type = 'php';

@@ -1,7 +1,12 @@
-import * as http from 'http';
+class SocketTransport implements YarTransport {
+  connection: any;
+  constructor() {
+    this.init();
+  }
 
-class SocketTransport {
-
+  init() {
+    this.connection = {};
+  }
 }
 
 export {

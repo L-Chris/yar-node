@@ -1,12 +1,12 @@
-declare module 'php-serialize' {
-  export function serialize(obj: object): any;
-  export function unserialize(buf: Buffer): any;
-}
-
-interface PackagerInterface {
+interface YarPackager {
   type: string;
   pack(payload: object): string;
   unpack(packet: Buffer): object;
+}
+
+interface YarTransport {
+  connection: any;
+  init: () => void;
 }
 
 interface Packet {
@@ -67,3 +67,5 @@ interface YarRequestPacket extends YarPacket {
 interface YarResponsePacket extends YarPacket {
   body: ReponseBody;
 }
+
+

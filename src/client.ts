@@ -13,7 +13,7 @@ class YarClient {
   private uri: URL;
   private protocol: string;
   private options: any;
-  private packager: PackagerInterface;
+  private packager: YarPackager;
   constructor(uri: string, options: YarClientOptions = {}) {
     const uriOptions = new URL(uri);
 
