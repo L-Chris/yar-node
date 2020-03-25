@@ -31,18 +31,31 @@ class YarServer {
       protocolEncoder.pipe(res);
 
       protocolDecoder.on('request', async (obj) => {
-        const {
-          m: methodName,
-          p: args,
-        } = obj.body;
+        try {
+          const {
+            m: methodName,
+            p: args,
+          } = obj.body;
 
-        const data = await this.methods[methodName](args);
-        protocolEncoder.writeResponse(obj, {
-          packager: obj.packager,
-          data,
-        });
+          if (typeof this.methods[methodName] !== 'function') {
+            throw new Error(`unsupported method ${methodName}`)
+          }
 
-        res.end();
+          const data = await this.methods[methodName](args);
+          protocolEncoder.writeResponse(obj, {
+            packager: obj.packager,
+            data,
+          });
+
+          res.end();
+        } catch(error) {
+          protocolEncoder.writeResponse(obj, {
+            packager: obj.packager,
+            data: {},
+            status: 1,
+            error
+          });
+        }
       });
     });
 

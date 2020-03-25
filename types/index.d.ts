@@ -32,6 +32,8 @@ interface YarResponse {
   packager: string;
   status?: number;
   data: any;
+  message?: string;
+  error?: Error;
 }
 
 interface RequestBody {

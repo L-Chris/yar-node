@@ -1,9 +1,9 @@
 import * as http from 'http';
 import { URL } from 'url';
-import { getPackager } from './packagers';
 import { ProtocolDecoder } from './decoder';
 import { ProtocolEncoder } from './encoder';
-import { nextId } from './utils';
+import { mt_rand } from 'locutus/php/math'
+import { YAR_CLIENT_PROTOCOL, PHP_YAR_VERSION, YAR_PACKAGER } from './const'
 
 export interface YarClientOptions {
   packager?: string;
@@ -13,15 +13,23 @@ class YarClient {
   private uri: URL;
   private protocol: string;
   private options: any;
-  private packager: YarPackager;
+  private packager: string;
   constructor(uri: string, options: YarClientOptions = {}) {
     const uriOptions = new URL(uri);
 
     this.uri = uriOptions;
     this.protocol = uriOptions.protocol;
-    options.packager = options.packager || 'php';
+    this.packager = options.packager || 'php';
+    if (YAR_CLIENT_PROTOCOL.HTTP !== this.protocol) {
+      throw new Error(`unsupported protocol ${this.protocol}`)
+    }
+
+    if (![YAR_PACKAGER.PHP, YAR_PACKAGER.JSON, YAR_PACKAGER.MSGPACK].includes(this.packager)) {
+      throw new Error(`unsupported packager ${this.packager}`)
+    }
+
+    options.packager = this.packager
     this.options = options;
-    this.packager = getPackager(this.options.packager);
   }
 
   call(methodName: string, args: any, callback: (o: object) => void) {
@@ -31,7 +39,7 @@ class YarClient {
       path: this.uri.pathname,
       protocol: this.uri.protocol,
       headers: {
-        'User-Agent': `PHP Yar Rpc-0.0.1`,
+        'User-Agent': `PHP Yar Rpc-${PHP_YAR_VERSION}`,
         'Content-Type': 'application/octet-stream',
         'Transfer-Encoding': 'chunked',
         'Connection': 'Keep-Alive',
@@ -48,11 +56,11 @@ class YarClient {
 
     protocolEncoder.pipe(req);
 
-    const id = nextId();
+    const id = mt_rand();
 
     protocolEncoder.writeRequest({
       id,
-      packager: this.options.packager,
+      packager: this.packager,
       methodName,
       args,
       timeout: 3000,

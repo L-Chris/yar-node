@@ -71,8 +71,8 @@ const responseEncode = (id: number, res: YarResponse) => {
     i: id,
     s: res.status || 0,
     r: res.data,
-    o: '',
-    e: '',
+    o: res.message || '',
+    e: 'error' in res ? res.error.message : ''
   };
 
   return encode({

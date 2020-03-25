@@ -1,6 +1,6 @@
 {
   "name": "yar-node",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "dist/index.js",
   "author": "Jiahui.liang <563303226@QQ.COM>",
   "repository": "https://github.com/L-Chris/yar-node",
@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "byte": "^2.0.0",
+    "locutus": "^2.0.11",
     "msgpack": "^1.0.3",
     "php-serialize": "^3.0.0",
     "rimraf": "^3.0.0"
   },
   "devDependencies": {
+    "@types/locutus": "^0.0.5",
     "@types/msgpack": "^0.0.30",
     "@types/node": "^12.7.11",
     "nodemon": "^1.19.2",

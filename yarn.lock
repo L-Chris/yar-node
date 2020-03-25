@@ -18,6 +18,11 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@types/locutus@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.npmjs.org/@types/locutus/-/locutus-0.0.5.tgz#007f09d350df9181b5d62b634c016076a54f97b6"
+  integrity sha1-AH8J01DfkYG11itjTAFgdqVPl7Y=
+
 "@types/msgpack@^0.0.30":
   version "0.0.30"
   resolved "https://registry.npmjs.org/@types/msgpack/-/msgpack-0.0.30.tgz#9c3cc2fad1ccd6675849879d1390a9596fed2ca8"
@@ -457,6 +462,11 @@ duplexer@~0.1.1:
   version "0.1.1"
   resolved "https://registry.npmjs.org/duplexer/-/duplexer-0.1.1.tgz#ace6ff808c1ce66b57d1ebf97977acb02334cfc1"
   integrity sha1-rOb/gIwc5mtX0ev5eXessCM0z8E=
+
+es6-promise@^4.2.5:
+  version "4.2.8"
+  resolved "https://registry.npmjs.org/es6-promise/-/es6-promise-4.2.8.tgz#4eb21594c972bc40553d276e510539143db53e0a"
+  integrity sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==
 
 escape-html@^1.0.3:
   version "1.0.3"
@@ -986,6 +996,13 @@ latest-version@^3.0.0:
   integrity sha1-ogU4P+oyKzO1rjsYq+4NwvNW7hU=
   dependencies:
     package-json "^4.0.0"
+
+locutus@^2.0.11:
+  version "2.0.11"
+  resolved "https://registry.npmjs.org/locutus/-/locutus-2.0.11.tgz#83f85109971fd3dd620482a04381916e4a31d4f0"
+  integrity sha512-C0q1L38lK5q1t+wE0KY21/9szrBHxye6o2z5EJzU+5B79tubNOC+nLAEzTTn1vPUGoUuehKh8kYKqiVUTWRyaQ==
+  dependencies:
+    es6-promise "^4.2.5"
 
 long@^4.0.0:
   version "4.0.0"
