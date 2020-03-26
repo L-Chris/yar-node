@@ -25,7 +25,7 @@ const { YarClient } = require('yar-node');
 
 const client = new YarClient('http://host/api/');
 
-client.call('someMethod', { name: 'Chris' }, res => {
+client.call('someMethod', { name: 'Chris' }).then(res => {
   console.log(`reponse:${res}`);
 });
 ```
