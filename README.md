@@ -3,7 +3,7 @@
 ### ✨ Features:
 - client[√]
 - server[√]
-- packager: json[√]、php[√]、msgpack[√]
+- packager: json[√]、php[√]、msgpack[×]
 - protocol: http[√]、tcp[×]、unix[×]
 
 ### Server
