@@ -32,45 +32,48 @@ class YarClient {
     this.options = options;
   }
 
-  call(methodName: string, args: any, callback: (o: object) => void) {
-    const options = {
-      hostname: this.uri.hostname,
-      port: this.uri.port,
-      path: this.uri.pathname,
-      protocol: this.uri.protocol,
-      headers: {
-        'User-Agent': `PHP Yar Rpc-${PHP_YAR_VERSION}`,
-        'Content-Type': 'application/octet-stream',
-        'Transfer-Encoding': 'chunked',
-        'Connection': 'Keep-Alive',
-        'Keep-Alive': '300',
-      },
-    };
+  call(methodName: string, args: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: this.uri.hostname,
+        port: this.uri.port,
+        path: this.uri.pathname,
+        protocol: this.uri.protocol,
+        headers: {
+          'User-Agent': `PHP Yar Rpc-${PHP_YAR_VERSION}`,
+          'Content-Type': 'application/octet-stream',
+          'Transfer-Encoding': 'chunked',
+          'Connection': 'Keep-Alive',
+          'Keep-Alive': '300',
+        },
+      };
 
-    const protocolEncoder = new ProtocolEncoder();
-    const protocolDecoder = new ProtocolDecoder();
+      const protocolEncoder = new ProtocolEncoder();
+      const protocolDecoder = new ProtocolDecoder();
 
-    const req = http.request(options, res => {
-      res.pipe(protocolDecoder);
-    });
+      const req = http.request(options, res => {
+        res.pipe(protocolDecoder);
+      });
 
-    protocolEncoder.pipe(req);
+      protocolEncoder.pipe(req);
 
-    const id = mt_rand();
+      const id = mt_rand();
 
-    protocolEncoder.writeRequest({
-      id,
-      packager: this.packager,
-      methodName,
-      args,
-      timeout: 3000,
-    });
+      protocolEncoder.writeRequest({
+        id,
+        packager: this.packager,
+        methodName,
+        args,
+        timeout: 3000,
+      });
 
-    protocolDecoder.on('response', (res: YarResponsePacket) => {
-      callback(res.body.r);
-    });
+      protocolDecoder.on('response', (res: YarResponsePacket) => {
+        resolve(res.body.r);
+      });
 
-    req.end();
+      req.end();
+    })
+
   }
 
   setOpt(key: string, value: any) {
